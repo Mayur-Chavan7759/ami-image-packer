@@ -1,0 +1,37 @@
+{
+    "builders": [
+        {
+            "type": "amazon-ebs",
+            "access_key": "",
+            "secret_key": "",
+            "region": "{{user `aws_region`}}",
+            "ami_name": "{{user `description`}}",
+            "source_ami": "ami-0a5b0c3ca9452f414",
+            "instance_type": "t2.micro",
+            "user_data_file":"ec2-userdata.ps1",
+            "Communicator": "winrm",
+            "winrm_username": "Administrator",
+            "winrm_use_ssl": "true",
+            "winrm_insecure": "true"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "powershell",
+            "script": "test.ps1"
+        },
+        {
+            "type": "powershell",
+            "inline": [
+                "C:/ProgramData/Amazon/EC2-Windows/Launch/Scripts/InitializeInstance.ps1 -Schedule",
+                "C:/ProgramData/Amazon/EC2-Windows/Launch/Scripts/SysprepInstance.ps1 -NoShutdown"
+            ]
+        }
+    ],
+    "post-processors": [
+        {
+          "type": "manifest",
+          "output": "{{user `description`}}.json"
+        }
+    ]
+}
